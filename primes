@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+
+'use strict';
+
+
+// Let's keep track of previously discovered prime numbers to speed things up:
+const primes = [2];
+let lastPrime = 2;
+
+function isPrime(number)
+{
+    let result = true;
+
+    for (let a=0; a<primes.length && primes[a]<number && result; a++)
+    {
+        if (number % primes[a] === 0)
+        {
+            result = false;
+        }
+    }
+
+    if (number > lastPrime)
+    {
+        for (let a=lastPrime + 1; a<number && result; a++)
+        {
+            if (number % a === 0)
+            {
+                result = false;
+            }
+        }
+    }
+
+    if (result && number > lastPrime)
+    {
+        primes.push(number);
+        lastPrime = number;
+    }
+
+    return result;
+}
+
+function findPrimesBefore(number)
+{
+    if (!isNaN(number))
+    {
+        for (let a=2; a<number; a++)
+        {
+            if (isPrime(a))
+            {
+                console.log('' + a);
+            }
+        }
+    }
+}
+
+
+if (process.argv[2] === '--before' && !isNaN(process.argv[3]))
+{
+    const number = parseInt(process.argv[3]);
+
+    if (process.argv[4] === '--benchmark')
+    {
+        console.time('Time elapsed');
+    }
+
+    findPrimesBefore(number);
+
+    if (process.argv[4] === '--benchmark')
+    {
+        console.timeEnd('Time elapsed');
+    }
+}
+else
+{
+    console.log('Usage:');
+    console.log('  primes --before <NUMBER> [--benchmark]');
+    console.log('  primes --help');
+}
